@@ -6,6 +6,9 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_talisman import Talisman
 from app.config import DevelopmentConfig
+from app.routes.main import main
+from app.routes.auth import auth
+from app.routes.tasks import tasks
 
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
@@ -26,10 +29,10 @@ def create_app():
     
     # Sécurité : Limiter les requêtes (anti-bruteforce)
     limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["200 per day", "20 per minute"]
-)
+        get_remote_address,
+        app=app,
+        default_limits=["200 per day", "20 per minute"]
+    )
     
     # Sécurité : Headers HTTP avec CSP adaptée pour CDN
     csp = {
@@ -51,10 +54,9 @@ def create_app():
     Talisman(app, content_security_policy=csp)
     
     # Enregistrer les blueprints
-    from app.routes.auth import auth
-    from app.routes.main import main
     app.register_blueprint(auth)
     app.register_blueprint(main)
+    app.register_blueprint(tasks)
 
     # Ouvrir une connexion à chaque requête
     @app.before_request

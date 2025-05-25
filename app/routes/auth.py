@@ -22,7 +22,7 @@ def login():
                     user.role = role
                     user.save()
                 return redirect(url_for('main.create_house'))
-            return redirect(url_for('main.index'))
+            return redirect(url_for('main.dashboard'))
         
         flash('Email ou mot de passe incorrect', 'error')
     return render_template('auth/login.html', form=form)

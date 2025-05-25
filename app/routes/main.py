@@ -2,7 +2,8 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
 from app.models.user import User, Role
 from app.models.house import House
-from app.forms import CreateHouseForm, ProfileForm
+from app.models.task import Task, ListTask
+from app.forms import RegisterForm, LoginForm, CreateHouseForm, ProfileForm, TaskForm, ListTaskForm
 
 main = Blueprint('main', __name__)
 
@@ -12,26 +13,32 @@ def index():
     return render_template('main/index.html')
 
 @main.route('/dashboard')
+@login_required
 def dashboard():
-    return render_template('dashboard.html')
+    user = current_user
+    house = user.house
+    # Récupérer les listes de tâches et les tâches
+    lists = ListTask.select()
+    tasks = Task.select().where(Task.list_task.is_null(False))
+    return render_template('dashboard.html', user=user, house=house, lists=lists, tasks=tasks)
 
 @main.route('/profile', methods=['GET', 'POST'])
+@login_required
 def profile():
-    if not current_user.is_authenticated:
-        return redirect(url_for('auth.login'))
     form = ProfileForm(obj=current_user)
     if form.validate_on_submit():
         current_user.name_user = form.name_user.data
         current_user.first_name_user = form.first_name_user.data
         current_user.username_user = form.username_user.data
+        current_user.email_user = form.email_user.data
         current_user.phone_user = form.phone_user.data
         current_user.age_user = form.age_user.data
         current_user.date_birthday_user = form.date_birthday_user.data
-        current_user.email_user = form.email_user.data
         current_user.description_user = form.description_user.data
         current_user.save()
-        flash('Profil mis à jour avec succès', 'success')
-    return render_template('profile.html', user=current_user, form=form)
+        flash('Profil mis à jour avec succès !', 'success')
+        return redirect(url_for('main.profile'))
+    return render_template('profile.html', form=form)
 
 @main.route('/create-house', methods=['GET', 'POST'])
 def create_house():

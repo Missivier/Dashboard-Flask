@@ -1,119 +1,149 @@
-<!DOCTYPE html>
-<html lang="fr" data-theme="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mon Profil</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css"
-      rel="stylesheet"
-      type="text/css"
-    />
-  </head>
-  <body class="bg-base-200 min-h-screen">
-    <div class="flex min-h-screen items-center justify-center">
-      <div
-        class="card bg-base-300 shadow-2xl border border-base-100 w-full max-w-2xl p-8"
-      >
-        <div class="flex items-center gap-4 mb-8">
-          <div class="avatar">
-            <div
-              class="w-20 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2"
-            >
-              <img
-                src="{{ user.photo_user or url_for('static', filename='images/default-avatar.png') }}"
-              />
-            </div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-primary">
-              {{ user.full_name }}
-            </div>
-            <div class="text-base-content/60">@{{ user.username_user }}</div>
-          </div>
-        </div>
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if
-        messages %}
-        <div class="mb-4">
-          {% for category, message in messages %}
-          <div
-            class="alert alert-{{ 'success' if category == 'success' else 'error' }}"
-          >
-            {{ message }}
-          </div>
-          {% endfor %}
-        </div>
-        {% endif %} {% endwith %}
-        <form method="POST" class="flex flex-col gap-4">
+{% extends "base.html" %} {% block page_content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">Profil</h1>
+
+    <div class="card bg-base-200 shadow-lg">
+      <div class="card-body">
+        <form method="POST" class="space-y-6">
           {{ form.hidden_tag() }}
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <label class="form-control w-full">
-              <div class="label">
-                <span class="label-text text-base-content">Nom</span>
-              </div>
-              {{ form.name_user(class_="input input-bordered w-full bg-base-200
-              text-base-content") }}
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ form.name_user.label }}</span
+              >
             </label>
-            <label class="form-control w-full">
-              <div class="label">
-                <span class="label-text text-base-content">Prénom</span>
-              </div>
-              {{ form.first_name_user(class_="input input-bordered w-full
-              bg-base-200 text-base-content") }}
+            {{ form.name_user(class="input input-bordered w-full") }} {% if
+            form.name_user.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error"
+                >{{ form.name_user.errors[0] }}</span
+              >
             </label>
-            <label class="form-control w-full">
-              <div class="label">
-                <span class="label-text text-base-content"
-                  >Nom d'utilisateur</span
-                >
-              </div>
-              {{ form.username_user(class_="input input-bordered w-full
-              bg-base-200 text-base-content") }}
-            </label>
-            <label class="form-control w-full">
-              <div class="label">
-                <span class="label-text text-base-content">Téléphone</span>
-              </div>
-              {{ form.phone_user(class_="input input-bordered w-full bg-base-200
-              text-base-content") }}
-            </label>
-            <label class="form-control w-full">
-              <div class="label">
-                <span class="label-text text-base-content">Âge</span>
-              </div>
-              {{ form.age_user(class_="input input-bordered w-full bg-base-200
-              text-base-content") }}
-            </label>
-            <label class="form-control w-full">
-              <div class="label">
-                <span class="label-text text-base-content"
-                  >Date de naissance</span
-                >
-              </div>
-              {{ form.date_birthday_user(class_="input input-bordered w-full
-              bg-base-200 text-base-content") }}
-            </label>
-            <label class="form-control w-full md:col-span-2">
-              <div class="label">
-                <span class="label-text text-base-content">Email</span>
-              </div>
-              {{ form.email_user(class_="input input-bordered w-full bg-base-200
-              text-base-content") }}
-            </label>
+            {% endif %}
           </div>
-          <label class="form-control w-full">
-            <div class="label">
-              <span class="label-text text-base-content">Description</span>
-            </div>
-            {{ form.description_user(class_="textarea textarea-bordered w-full
-            bg-base-200 text-base-content") }}
-          </label>
-          <button type="submit" class="btn btn-primary btn-lg w-full mt-4">
-            Enregistrer les modifications
-          </button>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ form.first_name_user.label }}</span
+              >
+            </label>
+            {{ form.first_name_user(class="input input-bordered w-full") }} {%
+            if form.first_name_user.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error"
+                >{{ form.first_name_user.errors[0] }}</span
+              >
+            </label>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ form.username_user.label }}</span
+              >
+            </label>
+            {{ form.username_user(class="input input-bordered w-full") }} {% if
+            form.username_user.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error"
+                >{{ form.username_user.errors[0] }}</span
+              >
+            </label>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ form.email_user.label }}</span
+              >
+            </label>
+            {{ form.email_user(class="input input-bordered w-full") }} {% if
+            form.email_user.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error"
+                >{{ form.email_user.errors[0] }}</span
+              >
+            </label>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ form.phone_user.label }}</span
+              >
+            </label>
+            {{ form.phone_user(class="input input-bordered w-full") }} {% if
+            form.phone_user.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error"
+                >{{ form.phone_user.errors[0] }}</span
+              >
+            </label>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ form.age_user.label }}</span
+              >
+            </label>
+            {{ form.age_user(class="input input-bordered w-full") }} {% if
+            form.age_user.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error"
+                >{{ form.age_user.errors[0] }}</span
+              >
+            </label>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ form.date_birthday_user.label }}</span
+              >
+            </label>
+            {{ form.date_birthday_user(class="input input-bordered w-full") }}
+            {% if form.date_birthday_user.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error"
+                >{{ form.date_birthday_user.errors[0] }}</span
+              >
+            </label>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ form.description_user.label }}</span
+              >
+            </label>
+            {{ form.description_user(class="textarea textarea-bordered w-full")
+            }} {% if form.description_user.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error"
+                >{{ form.description_user.errors[0] }}</span
+              >
+            </label>
+            {% endif %}
+          </div>
+
+          <div class="card-actions justify-end">
+            <button type="submit" class="btn btn-primary">
+              {{ form.submit.label }}
+            </button>
+          </div>
         </form>
       </div>
     </div>
-  </body>
-</html>
+  </div>
+</div>
+{% endblock %}
