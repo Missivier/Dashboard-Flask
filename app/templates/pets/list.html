@@ -1,0 +1,126 @@
+{% extends "base.html" %} {% block page_content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Mes animaux de compagnie</h1>
+    <a href="{{ url_for('pets.create_pet') }}" class="btn btn-primary">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4v16m8-8H4"
+        />
+      </svg>
+      Ajouter un animal
+    </a>
+  </div>
+
+  {% if pets %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for pet in pets %}
+    <div class="card bg-base-200 shadow-lg">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="card-title text-xl">{{ pet.name }}</h2>
+        <div class="flex gap-2">
+          <a
+            href="{{ url_for('pets.edit_pet', id=pet.id) }}"
+            class="btn btn-ghost btn-sm"
+            title="Modifier"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+          </a>
+          <form
+            action="{{ url_for('pets.delete_pet', id=pet.id) }}"
+            method="POST"
+            class="inline"
+          >
+            <button
+              type="submit"
+              class="btn btn-ghost btn-sm text-error"
+              title="Supprimer"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex items-center gap-2 p-2 bg-base-100 rounded-lg">
+          <span class="font-medium">Espèce:</span>
+          <span>{{ pet.species }}</span>
+        </div>
+        {% if pet.breed %}
+        <div class="flex items-center gap-2 p-2 bg-base-100 rounded-lg">
+          <span class="font-medium">Race:</span>
+          <span>{{ pet.breed }}</span>
+        </div>
+        {% endif %} {% if pet.birth_date %}
+        <div class="flex items-center gap-2 p-2 bg-base-100 rounded-lg">
+          <span class="font-medium">Date de naissance:</span>
+          <span>{{ pet.birth_date.strftime('%d/%m/%Y') }}</span>
+        </div>
+        {% endif %} {% if pet.weight %}
+        <div class="flex items-center gap-2 p-2 bg-base-100 rounded-lg">
+          <span class="font-medium">Poids:</span>
+          <span>{{ pet.weight }} kg</span>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-info">
+    <div class="flex-1">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="w-6 h-6 mx-2 stroke-current"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
+      </svg>
+      <label>Aucun animal enregistré</label>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

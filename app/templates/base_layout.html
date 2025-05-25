@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskManager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body class="bg-base-200 min-h-screen">
+    <!-- Drawer pour mobile -->
+    <div class="drawer lg:drawer-open">
+      <input id="sidebar-drawer" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content flex flex-col min-h-screen">
+        <!-- Header -->
+        <div
+          class="flex items-center justify-between p-4 lg:hidden bg-base-300"
+        >
+          <label for="sidebar-drawer" class="btn btn-ghost btn-circle">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </label>
+          <span class="text-2xl font-bold text-primary">TaskManager</span>
+        </div>
+
+        <!-- Main content -->
+        <main class="flex-1 p-4 lg:p-8">{% block content %}{% endblock %}</main>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="drawer-side z-40">
+        <label for="sidebar-drawer" class="drawer-overlay"></label>
+        <aside
+          class="w-64 bg-base-300 text-base-content flex flex-col p-4 gap-2 min-h-screen"
+        >
+          {% block sidebar %}{% endblock %}
+        </aside>
+      </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="toast toast-top toast-end">
+      {% for category, message in messages %}
+      <div
+        class="alert alert-{{ category if category != 'message' else 'info' }}"
+      >
+        <span>{{ message }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+  </body>
+</html>

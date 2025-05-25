@@ -1,0 +1,246 @@
+{% extends "base.html" %} {% block page_content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Calendrier</h1>
+    <a href="{{ url_for('calendar.new_event') }}" class="btn btn-primary">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5 mr-2"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 4v16m8-8H4"
+        />
+      </svg>
+      Nouvel événement
+    </a>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Calendrier -->
+    <div class="lg:col-span-2">
+      <div class="card bg-base-200 shadow-lg">
+        <div class="card-body">
+          <div class="calendar-container">
+            <div class="calendar-header flex justify-between items-center mb-4">
+              <button class="btn btn-sm" onclick="previousMonth()">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+              <h3 class="text-lg font-semibold" id="currentMonth"></h3>
+              <button class="btn btn-sm" onclick="nextMonth()">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div class="calendar-grid grid grid-cols-7 gap-1 text-center">
+              <div class="text-sm font-semibold">Dim</div>
+              <div class="text-sm font-semibold">Lun</div>
+              <div class="text-sm font-semibold">Mar</div>
+              <div class="text-sm font-semibold">Mer</div>
+              <div class="text-sm font-semibold">Jeu</div>
+              <div class="text-sm font-semibold">Ven</div>
+              <div class="text-sm font-semibold">Sam</div>
+              <div
+                id="calendarDays"
+                class="col-span-7 grid grid-cols-7 gap-1"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Détails des événements -->
+    <div class="lg:col-span-1">
+      <div class="card bg-base-200 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title text-xl mb-4">Événements du jour</h2>
+          <div id="eventDetails" class="space-y-4">
+            {% if events %} {% for event in events %}
+            <div class="event-item p-4 bg-base-100 rounded-lg">
+              <h3 class="font-semibold text-lg">{{ event.title }}</h3>
+              <p class="text-base-content/70">{{ event.description }}</p>
+              <div class="mt-2 flex justify-between items-center">
+                <span class="text-sm"
+                  >{{ event.start_date.strftime('%H:%M') }}</span
+                >
+                <div class="flex gap-2">
+                  <a
+                    href="{{ url_for('calendar.edit_event', id_event=event.id_event) }}"
+                    class="btn btn-ghost btn-sm"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                  </a>
+                  <form
+                    action="{{ url_for('calendar.delete_event', id_event=event.id_event) }}"
+                    method="POST"
+                    class="inline"
+                  >
+                    <button
+                      type="submit"
+                      class="btn btn-ghost btn-sm text-error"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %} {% else %}
+            <div class="alert alert-info">
+              <div class="flex-1">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  class="w-6 h-6 mx-2 stroke-current"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+                <label>Aucun événement pour cette date</label>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentDate = new Date();
+  const months = [
+    "Janvier",
+    "Février",
+    "Mars",
+    "Avril",
+    "Mai",
+    "Juin",
+    "Juillet",
+    "Août",
+    "Septembre",
+    "Octobre",
+    "Novembre",
+    "Décembre",
+  ];
+
+  function updateCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    document.getElementById(
+      "currentMonth"
+    ).textContent = `${months[month]} ${year}`;
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    const calendarDays = document.getElementById("calendarDays");
+    calendarDays.innerHTML = "";
+
+    for (let i = 0; i < firstDay.getDay(); i++) {
+      const emptyDay = document.createElement("div");
+      emptyDay.className = "p-2 text-base-content/30";
+      calendarDays.appendChild(emptyDay);
+    }
+
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      const dayElement = document.createElement("div");
+      dayElement.className = "p-2 hover:bg-base-100 rounded cursor-pointer";
+
+      const isToday =
+        new Date().toDateString() === new Date(year, month, day).toDateString();
+      if (isToday) {
+        dayElement.className += " bg-primary text-primary-content";
+      }
+
+      dayElement.textContent = day;
+      dayElement.onclick = () => loadEvents(year, month + 1, day);
+      calendarDays.appendChild(dayElement);
+    }
+  }
+
+  function previousMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    updateCalendar();
+  }
+
+  function nextMonth() {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    updateCalendar();
+  }
+
+  function loadEvents(year, month, day) {
+    const date = `${year}-${month.toString().padStart(2, "0")}-${day
+      .toString()
+      .padStart(2, "0")}`;
+    window.location.href = `{{ url_for('calendar.calendar') }}?date=${date}`;
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    updateCalendar();
+  });
+</script>
+{% endblock %}

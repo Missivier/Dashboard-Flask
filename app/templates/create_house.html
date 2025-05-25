@@ -1,0 +1,67 @@
+{% extends "auth_base.html" %} {% block title %}Créer une maison{% endblock %}
+{% block left_card %}
+<div
+  class="card bg-base-100/90 shadow-xl p-4 flex flex-row items-center gap-4 min-w-[320px]"
+>
+  <div class="avatar">
+    <div class="w-14 rounded-full">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" />
+    </div>
+  </div>
+  <div>
+    <div class="font-bold text-base-content">Nexus Home</div>
+    <div class="text-xs text-base-content/60">
+      Créez votre espace de vie partagé
+    </div>
+    <div class="text-xs mt-2 text-base-content">
+      Gérez vos tâches, budgets et événements en équipe !
+    </div>
+  </div>
+</div>
+{% endblock %} {% block content %}
+<div class="flex flex-col gap-6">
+  <div class="flex items-center justify-between mb-2">
+    <span class="text-2xl font-bold text-primary">Nexus</span>
+  </div>
+  <div class="mb-2">
+    <h2 class="text-2xl font-bold text-base-content mb-1">Créer une maison</h2>
+    <div class="text-base-content/60 text-sm">
+      Définissez votre espace de vie pour commencer à collaborer.
+    </div>
+  </div>
+  <form method="POST" class="flex flex-col gap-4">
+    {{ form.hidden_tag() }}
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text text-base-content">Nom de la maison</span>
+      </div>
+      {{ form.name_house(class_="input input-bordered w-full bg-base-200
+      text-base-content") }}
+    </label>
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text text-base-content">Adresse</span>
+      </div>
+      {{ form.adress(class_="input input-bordered w-full bg-base-200
+      text-base-content") }}
+    </label>
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text text-base-content">Description</span>
+      </div>
+      {{ form.description_house(class_="textarea textarea-bordered w-full
+      bg-base-200 text-base-content") }}
+    </label>
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text text-base-content">Photo (URL)</span>
+      </div>
+      {{ form.photo_house(class_="input input-bordered w-full bg-base-200
+      text-base-content") }}
+    </label>
+    <button type="submit" class="btn btn-primary btn-lg w-full mt-2">
+      Créer la maison
+    </button>
+  </form>
+</div>
+{% endblock %}

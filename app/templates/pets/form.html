@@ -1,0 +1,98 @@
+{% extends "base.html" %} {% block page_content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto">
+    <div class="card bg-base-200 shadow-lg">
+      <div class="card-body">
+        <h1 class="text-2xl font-bold mb-6">{{ title }}</h1>
+
+        <form method="POST" class="space-y-6">
+          {{ form.hidden_tag() }}
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">{{ form.name.label }}</span>
+            </label>
+            {{ form.name(class="input input-bordered w-full") }} {% if
+            form.name.errors %}
+            <div class="text-error text-sm mt-1">
+              {% for error in form.name.errors %}
+              <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ form.species.label }}</span
+              >
+            </label>
+            {{ form.species(class="select select-bordered w-full") }} {% if
+            form.species.errors %}
+            <div class="text-error text-sm mt-1">
+              {% for error in form.species.errors %}
+              <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium">{{ form.breed.label }}</span>
+            </label>
+            {{ form.breed(class="input input-bordered w-full") }} {% if
+            form.breed.errors %}
+            <div class="text-error text-sm mt-1">
+              {% for error in form.breed.errors %}
+              <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ form.birth_date.label }}</span
+              >
+            </label>
+            {{ form.birth_date(class="input input-bordered w-full", type="date")
+            }} {% if form.birth_date.errors %}
+            <div class="text-error text-sm mt-1">
+              {% for error in form.birth_date.errors %}
+              <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-medium"
+                >{{ form.weight.label }}</span
+              >
+            </label>
+            {{ form.weight(class="input input-bordered w-full", type="number",
+            step="0.1") }} {% if form.weight.errors %}
+            <div class="text-error text-sm mt-1">
+              {% for error in form.weight.errors %}
+              <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="flex justify-end gap-4 mt-8">
+            <a href="{{ url_for('pets.list_pets') }}" class="btn btn-ghost"
+              >Annuler</a
+            >
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

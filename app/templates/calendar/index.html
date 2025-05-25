@@ -1,0 +1,260 @@
+{% extends "base.html" %} {% block title %}Calendrier{% endblock %} {% block
+styles %}
+<link
+  href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
+  rel="stylesheet"
+/>
+<style>
+  #calendar {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .fc-event {
+    cursor: pointer;
+  }
+  .fc-event-title {
+    font-weight: bold;
+  }
+  .fc-event-description {
+    font-size: 0.9em;
+    margin-top: 2px;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="mb-4">Calendrier</h1>
+      <div id="calendar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour créer/modifier un événement -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Événement</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="eventForm">
+          <input type="hidden" id="eventId" />
+          <div class="mb-3">
+            <label for="title" class="form-label">Titre</label>
+            <input type="text" class="form-control" id="title" required />
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="start" class="form-label">Début</label>
+            <input
+              type="datetime-local"
+              class="form-control"
+              id="start"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="end" class="form-label">Fin</label>
+            <input type="datetime-local" class="form-control" id="end" />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-danger"
+          id="deleteEvent"
+          style="display: none"
+        >
+          Supprimer
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Annuler
+        </button>
+        <button type="button" class="btn btn-primary" id="saveEvent">
+          Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const calendarEl = document.getElementById("calendar");
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      locale: "fr",
+      initialView: "dayGridMonth",
+      headerToolbar: {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,timeGridDay",
+      },
+      events: "/api/events",
+      editable: true,
+      selectable: true,
+      selectMirror: true,
+      dayMaxEvents: true,
+      eventTimeFormat: {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      },
+      eventDidMount: function (info) {
+        if (info.event.extendedProps.description) {
+          info.el.title = info.event.extendedProps.description;
+        }
+      },
+      select: function (info) {
+        showEventModal(null, info.start, info.end);
+      },
+      eventClick: function (info) {
+        showEventModal(info.event);
+      },
+      eventDrop: function (info) {
+        updateEvent(info.event);
+      },
+      eventResize: function (info) {
+        updateEvent(info.event);
+      },
+    });
+    calendar.render();
+
+    const eventModal = new bootstrap.Modal(
+      document.getElementById("eventModal")
+    );
+    const eventForm = document.getElementById("eventForm");
+    const deleteEventBtn = document.getElementById("deleteEvent");
+
+    function showEventModal(event, start, end) {
+      const modal = document.getElementById("eventModal");
+      const eventId = document.getElementById("eventId");
+      const title = document.getElementById("title");
+      const description = document.getElementById("description");
+      const startInput = document.getElementById("start");
+      const endInput = document.getElementById("end");
+
+      if (event) {
+        eventId.value = event.id;
+        title.value = event.title;
+        description.value = event.extendedProps.description || "";
+        startInput.value = event.start.toISOString().slice(0, 16);
+        endInput.value = event.end ? event.end.toISOString().slice(0, 16) : "";
+        deleteEventBtn.style.display = "block";
+      } else {
+        eventId.value = "";
+        title.value = "";
+        description.value = "";
+        startInput.value = start.toISOString().slice(0, 16);
+        endInput.value = end ? end.toISOString().slice(0, 16) : "";
+        deleteEventBtn.style.display = "none";
+      }
+
+      eventModal.show();
+    }
+
+    document.getElementById("saveEvent").addEventListener("click", function () {
+      const eventId = document.getElementById("eventId").value;
+      const eventData = {
+        title: document.getElementById("title").value,
+        description: document.getElementById("description").value,
+        start: document.getElementById("start").value,
+        end: document.getElementById("end").value || null,
+      };
+
+      if (eventId) {
+        fetch(`/api/events/${eventId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(eventData),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Erreur lors de la mise à jour de l'événement");
+            }
+            calendar.refetchEvents();
+            eventModal.hide();
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      } else {
+        fetch("/api/events", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(eventData),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Erreur lors de la création de l'événement");
+            }
+            calendar.refetchEvents();
+            eventModal.hide();
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      }
+    });
+
+    deleteEventBtn.addEventListener("click", function () {
+      const eventId = document.getElementById("eventId").value;
+      if (confirm("Êtes-vous sûr de vouloir supprimer cet événement ?")) {
+        fetch(`/api/events/${eventId}`, {
+          method: "DELETE",
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Erreur lors de la suppression de l'événement");
+            }
+            calendar.refetchEvents();
+            eventModal.hide();
+          })
+          .catch((error) => {
+            alert(error.message);
+          });
+      }
+    });
+
+    function updateEvent(event) {
+      fetch(`/api/events/${event.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: event.title,
+          description: event.extendedProps.description,
+          start: event.start.toISOString(),
+          end: event.end ? event.end.toISOString() : null,
+        }),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Erreur lors de la mise à jour de l'événement");
+          }
+        })
+        .catch((error) => {
+          alert(error.message);
+          calendar.refetchEvents();
+        });
+    }
+  });
+</script>
+{% endblock %}

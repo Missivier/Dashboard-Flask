@@ -1,0 +1,201 @@
+{% extends "base.html" %} {% block page_content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Gestion des tâches</h1>
+    <div class="flex gap-4">
+      <a href="{{ url_for('tasks.new_list') }}" class="btn btn-primary">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        Nouvelle liste
+      </a>
+      <a href="{{ url_for('tasks.new') }}" class="btn btn-secondary">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 mr-2"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4v16m8-8H4"
+          />
+        </svg>
+        Nouvelle tâche
+      </a>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for list in lists %}
+    <div class="card bg-base-200 shadow-lg">
+      <div class="card-body">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="card-title text-xl">{{ list.name_list_task }}</h2>
+          <div class="flex gap-2">
+            <a
+              href="{{ url_for('tasks.edit_list', id_list_task=list.id_list_task) }}"
+              class="btn btn-ghost btn-sm"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
+            </a>
+            <form
+              action="{{ url_for('tasks.delete_list', id_list_task=list.id_list_task) }}"
+              method="POST"
+              class="inline"
+            >
+              <button
+                type="submit"
+                class="btn btn-ghost btn-sm text-error"
+                onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette liste ?')"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  />
+                </svg>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          {% for task in list.tasks %}
+          <div class="flex items-center gap-2 p-2 bg-base-100 rounded-lg">
+            <form
+              action="{{ url_for('tasks.toggle_status', id_task=task.id_task) }}"
+              method="POST"
+              class="flex-1 flex items-center gap-2"
+            >
+              <input
+                type="checkbox"
+                class="checkbox checkbox-primary checkbox-sm"
+                {%
+                if
+                task.is_completed
+                %}checked{%
+                endif
+                %}
+                onchange="this.form.submit()"
+              />
+              <span
+                class="flex-1 text-sm {% if task.is_completed %}line-through text-base-content/60{% endif %}"
+              >
+                {{ task.name_task }}
+              </span>
+              <div class="flex gap-1">
+                <a
+                  href="{{ url_for('tasks.edit', id_task=task.id_task) }}"
+                  class="btn btn-ghost btn-xs"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                </a>
+                <form
+                  action="{{ url_for('tasks.delete', id_task=task.id_task) }}"
+                  method="POST"
+                  class="inline"
+                >
+                  <button
+                    type="submit"
+                    class="btn btn-ghost btn-xs text-error"
+                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </form>
+              </div>
+            </form>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="card-actions justify-end mt-4">
+          <a
+            href="{{ url_for('tasks.new', list_id=list.id_list_task) }}"
+            class="btn btn-primary btn-sm"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-4 w-4 mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Nouvelle tâche
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

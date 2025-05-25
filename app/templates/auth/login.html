@@ -1,0 +1,80 @@
+{% extends "auth_base.html" %} {% block title %}Connexion{% endblock %} {% block
+left_card %}
+<div
+  class="card bg-base-100/90 shadow-xl p-4 flex flex-row items-center gap-4 min-w-[320px]"
+>
+  <div class="avatar">
+    <div class="w-14 rounded-full">
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" />
+    </div>
+  </div>
+  <div>
+    <div class="font-bold text-base-content">Pouya Saadeghi</div>
+    <div class="text-xs text-base-content/60">Creator of daisyUI</div>
+    <div class="text-xs mt-2 text-base-content">
+      This is the ultimate admin dashboard for any React project
+    </div>
+  </div>
+</div>
+{% endblock %} {% block content %}
+<div class="flex flex-col gap-6">
+  <div class="flex items-center justify-between mb-2">
+    <span class="text-2xl font-bold text-primary">Nexus</span>
+    <button class="btn btn-ghost btn-circle" title="Mode sombre (placeholder)">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.95 7.05l-.71-.71M6.34 6.34l-.71-.71"
+        />
+      </svg>
+    </button>
+  </div>
+  <div class="mb-2">
+    <h2 class="text-2xl font-bold text-base-content mb-1">Login</h2>
+    <div class="text-base-content/60 text-sm">
+      Seamless Access, Secure Connection: Your Gateway to a Personalized
+      Experience.
+    </div>
+  </div>
+  <form method="POST" class="flex flex-col gap-4">
+    {{ form.hidden_tag() }}
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text text-base-content">Email</span>
+      </div>
+      {{ form.email(class_="input input-bordered w-full bg-base-200
+      text-base-content") }}
+    </label>
+    <label class="form-control w-full">
+      <div class="label">
+        <span class="label-text text-base-content">Mot de passe</span>
+      </div>
+      {{ form.password(class_="input input-bordered w-full bg-base-200
+      text-base-content") }}
+    </label>
+    <div class="flex items-center gap-2 mt-2">
+      {{ form.remember() }}
+      <label for="remember" class="text-xs text-base-content"
+        >Se souvenir de moi</label
+      >
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg w-full mt-2">
+      Se connecter
+    </button>
+  </form>
+  <div class="text-center mt-4 text-sm">
+    Haven't account
+    <a href="{{ url_for('auth.register') }}" class="link link-primary"
+      >Create One</a
+    >
+  </div>
+</div>
+{% endblock %}
