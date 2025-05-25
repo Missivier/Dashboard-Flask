@@ -5,6 +5,7 @@ from app.models.user import User
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_talisman import Talisman
+from app.config import DevelopmentConfig
 
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
@@ -15,7 +16,7 @@ def load_user(user_id):
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'votre_clé_secrète_ici'  # À changer en production
+    app.config.from_object(DevelopmentConfig)
     
     # Initialiser Flask-Login
     login_manager.init_app(app)
