@@ -4,6 +4,10 @@ from app.models.user import User, Role
 from app.models.house import House
 from app.models.task import Task, ListTask
 from app.forms import RegisterForm, LoginForm, CreateHouseForm, ProfileForm, TaskForm, ListTaskForm
+from app.models.budget import Budget
+from app.models.event import Event
+from app.models.pet import Pet
+from datetime import datetime, timedelta
 
 main = Blueprint('main', __name__)
 
@@ -20,7 +24,38 @@ def dashboard():
     # Récupérer les listes de tâches et les tâches
     lists = ListTask.select()
     tasks = Task.select().where(Task.list_task.is_null(False))
-    return render_template('dashboard.html', user=user, house=house, lists=lists, tasks=tasks)
+    # Récupérer tous les budgets
+    budgets = Budget.select()
+    total_expenses = sum(b.amount for b in budgets if b.is_expense)
+    total_income = sum(b.amount for b in budgets if not b.is_expense)
+    # Récupérer les animaux de l'utilisateur
+    pets = Pet.select().where(Pet.owner == current_user)
+    # Récupérer les événements à venir et d'aujourd'hui
+    today = datetime.now().date()
+    tomorrow = today + timedelta(days=1)
+    
+    upcoming_events = Event.select().where(
+        (Event.user_id == current_user.id) &
+        (Event.start_date >= tomorrow)
+    ).count()
+    
+    today_events = Event.select().where(
+        (Event.user_id == current_user.id) &
+        (Event.start_date >= today) &
+        (Event.start_date < tomorrow)
+    ).count()
+    
+    return render_template('dashboard.html',
+                         user=user,
+                         house=house,
+                         lists=lists,
+                         tasks=tasks,
+                         budgets=budgets,
+                         pets=pets,
+                         total_expenses=total_expenses,
+                         total_income=total_income,
+                         upcoming_events=upcoming_events,
+                         today_events=today_events)
 
 @main.route('/profile', methods=['GET', 'POST'])
 @login_required

@@ -22,3 +22,4 @@ python-dotenv==1.0.1
 Werkzeug==3.0.1
 wtf-peewee==3.0.6
 WTForms==3.2.1
+django-calendar==0.1.0

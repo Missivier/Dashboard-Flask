@@ -1,141 +1,264 @@
 {% extends "base.html" %} {% block page_content %}
 <div class="container mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold mb-8">Tableau de bord</h1>
+  <!-- En-tête avec informations utilisateur -->
+  <div
+    class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8"
+  >
+    <div class="mb-4 md:mb-0">
+      <h1 class="text-3xl font-bold">Tableau de bord</h1>
+      <p class="text-base-content/70 mt-2">
+        Bienvenue, {{ user.first_name_user }} {{ user.name_user }}
+      </p>
+    </div>
+    <div class="text-left md:text-right">
+      <p class="text-lg font-medium">{{ house.name_house }}</p>
+      <p class="text-base-content/70">{{ house.adress }}</p>
+    </div>
+  </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Carrousel des listes de tâches -->
-    <div class="card bg-base-200 shadow-lg lg:col-span-2">
+  <!-- Cartes de gestion -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <!-- Carte Gestion des animaux -->
+    <div class="card bg-base-200 shadow-lg">
       <div class="card-body">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="card-title text-xl">Listes de tâches</h2>
-          <div class="flex items-center gap-4">
-            <div class="join">
-              <button class="join-item btn btn-sm" onclick="prevList()">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 19l-7-7 7-7"
-                  />
-                </svg>
-              </button>
-              <button class="join-item btn btn-sm" onclick="nextList()">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </button>
-            </div>
-            <div class="flex gap-1" id="carousel-indicators">
-              {% for list in lists %}
-              <button
-                class="btn btn-xs btn-circle"
-                onclick="showList({{ loop.index0 }})"
-              ></button>
+        <h2 class="card-title text-xl mb-4">Gestion des animaux</h2>
+        <p class="text-base-content/70 mb-4">
+          Gérez vos animaux de compagnie et leurs informations
+        </p>
+        {% if pets %}
+        <div class="overflow-x-auto">
+          <table class="table w-full">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Espèce</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pet in pets %}
+              <tr>
+                <td>{{ pet.name }}</td>
+                <td>{{ pet.species }}</td>
+                <td>
+                  <div class="flex gap-2">
+                    <a
+                      href="{{ url_for('pets.edit_pet', id=pet.id) }}"
+                      class="btn btn-ghost btn-sm"
+                      title="Modifier"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </a>
+                    <form
+                      action="{{ url_for('pets.delete_pet', id=pet.id) }}"
+                      method="POST"
+                      class="inline"
+                    >
+                      <button
+                        type="submit"
+                        class="btn btn-ghost btn-sm text-error"
+                        title="Supprimer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
               {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+          <div class="flex-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              class="w-6 h-6 mx-2 stroke-current"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            <label>Aucun animal enregistré</label>
+          </div>
+        </div>
+        {% endif %}
+        <div class="card-actions justify-end mt-4">
+          <a href="{{ url_for('pets.create_pet') }}" class="btn btn-primary">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Ajouter un animal
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carte Gestion du budget -->
+    <div class="card bg-base-200 shadow-lg">
+      <div class="card-body">
+        <h2 class="card-title text-xl mb-4">Gestion du budget</h2>
+        <p class="text-base-content/70 mb-4">Suivez vos dépenses et revenus</p>
+        <div class="flex flex-col gap-2 mb-4">
+          <div
+            class="flex justify-between items-center p-2 bg-base-100 rounded-lg"
+          >
+            <span class="font-medium">Dépenses totales:</span>
+            <span class="text-error"
+              >{{ "%.2f"|format(total_expenses) }} €</span
+            >
+          </div>
+          <div
+            class="flex justify-between items-center p-2 bg-base-100 rounded-lg"
+          >
+            <span class="font-medium">Revenus totaux:</span>
+            <span class="text-success"
+              >{{ "%.2f"|format(total_income) }} €</span
+            >
+          </div>
+        </div>
+        <div class="card-actions justify-end">
+          <a
+            href="{{ url_for('budgets.list_budgets') }}"
+            class="btn btn-primary"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            Gérer le budget
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carte Tâches -->
+    <div class="card bg-base-200 shadow-lg">
+      <div class="card-body">
+        <div
+          class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4"
+        >
+          <h2 class="card-title text-xl mb-4 md:mb-0">Mes tâches</h2>
+          <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+            <!-- Filtre par liste -->
+            <div class="form-control w-full md:w-48">
+              <select
+                id="listFilter"
+                class="select select-bordered w-full"
+                onchange="filterTasks()"
+              >
+                <option value="">Toutes les listes</option>
+                {% for list in lists %}
+                <option value="{{ list.id_list_task }}">
+                  {{ list.name_list_task }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <!-- Filtre par statut -->
+            <div class="form-control w-full md:w-48">
+              <select
+                id="statusFilter"
+                class="select select-bordered w-full"
+                onchange="filterTasks()"
+              >
+                <option value="">Tous les statuts</option>
+                <option value="completed">Terminées</option>
+                <option value="pending">En cours</option>
+              </select>
             </div>
           </div>
         </div>
 
-        <div class="carousel w-full" id="listCarousel">
-          {% for list in lists %}
-          <div class="carousel-item w-full" id="list-{{ list.id_list_task }}">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-xl font-bold">{{ list.name_list_task }}</h3>
-              <div class="flex gap-2">
-                <a
-                  href="{{ url_for('tasks.edit_list', id_list_task=list.id_list_task) }}"
-                  class="btn btn-sm btn-ghost"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                </a>
-                <form
-                  action="{{ url_for('tasks.delete_list', id_list_task=list.id_list_task) }}"
-                  method="POST"
-                  class="inline"
-                >
-                  <button
-                    type="submit"
-                    class="btn btn-sm btn-ghost text-error"
-                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette liste ?')"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                  </button>
-                </form>
-              </div>
-            </div>
-
-            <div class="space-y-2">
-              {% for task in list.tasks %}
-              <div class="flex items-center gap-2 p-2 bg-base-100 rounded-lg">
-                <form
-                  action="{{ url_for('tasks.toggle_status', id_task=task.id_task) }}"
-                  method="POST"
-                  class="flex-1 flex items-center gap-2"
-                >
-                  <input
-                    type="checkbox"
-                    class="checkbox checkbox-primary checkbox-sm"
-                    {%
-                    if
-                    task.is_completed
-                    %}checked{%
-                    endif
-                    %}
-                    onchange="this.form.submit()"
-                  />
+        {% if tasks %}
+        <div class="overflow-x-auto">
+          <table class="table w-full">
+            <thead>
+              <tr>
+                <th>Nom</th>
+                <th>Liste</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tasksTableBody">
+              {% for task in tasks %}
+              <tr
+                class="task-row"
+                data-list="{{ task.list_task.id_list_task if task.list_task else '' }}"
+                data-status="{{ 'completed' if task.is_completed else 'pending' }}"
+              >
+                <td>{{ task.name_task }}</td>
+                <td>
+                  {{ task.list_task.name_list_task if task.list_task else 'Sans
+                  liste' }}
+                </td>
+                <td>
                   <span
-                    class="flex-1 text-sm {% if task.is_completed %}line-through text-base-content/60{% endif %}"
+                    class="badge {{ 'badge-success' if task.is_completed else 'badge-warning' }}"
                   >
-                    {{ task.name_task }}
+                    {{ 'Terminée' if task.is_completed else 'En cours' }}
                   </span>
-                  <div class="flex gap-1">
+                </td>
+                <td>
+                  <div class="flex gap-2">
                     <a
                       href="{{ url_for('tasks.edit', id_task=task.id_task) }}"
-                      class="btn btn-ghost btn-xs"
+                      class="btn btn-ghost btn-sm"
+                      title="Modifier"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -159,8 +282,8 @@
                     >
                       <button
                         type="submit"
-                        class="btn btn-ghost btn-xs text-error"
-                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')"
+                        class="btn btn-ghost btn-sm text-error"
+                        title="Supprimer"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -179,63 +302,127 @@
                       </button>
                     </form>
                   </div>
-                </form>
-              </div>
+                </td>
+              </tr>
               {% endfor %}
-            </div>
-
-            <div class="mt-4 flex justify-between items-center">
-              <a
-                href="{{ url_for('tasks.new', list_id=list.id_list_task) }}"
-                class="btn btn-sm btn-primary"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-4 w-4 mr-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                Nouvelle tâche
-              </a>
-              <a
-                href="{{ url_for('tasks.index') }}"
-                class="btn btn-sm btn-ghost"
-                >Voir toutes les tâches</a
-              >
-            </div>
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+          <div class="flex-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              class="w-6 h-6 mx-2 stroke-current"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            <label>Aucune tâche enregistrée</label>
           </div>
-          {% endfor %}
+        </div>
+        {% endif %}
+        <div class="card-actions justify-end mt-4">
+          <a href="{{ url_for('tasks.new') }}" class="btn btn-primary">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Ajouter une tâche
+          </a>
         </div>
       </div>
     </div>
 
-    <!-- Carte des statistiques -->
+    <!-- Carte Calendrier -->
     <div class="card bg-base-200 shadow-lg">
       <div class="card-body">
-        <h2 class="card-title text-xl mb-4">Statistiques</h2>
-        <div class="stats stats-vertical shadow">
-          <div class="stat">
-            <div class="stat-title">Tâches totales</div>
-            <div class="stat-value">{{ tasks|length }}</div>
+        <h2 class="card-title text-xl mb-4">Calendrier</h2>
+        <!-- Mini-calendrier -->
+        <div class="calendar-container">
+          <div class="calendar-header flex justify-between items-center mb-2">
+            <button class="btn btn-sm" onclick="previousMonth()">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            <h3 class="text-lg font-semibold" id="currentMonth"></h3>
+            <button class="btn btn-sm" onclick="nextMonth()">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
           </div>
-          <div class="stat">
-            <div class="stat-title">Tâches terminées</div>
-            <div class="stat-value">
-              {{ tasks|selectattr('is_completed', 'true')|list|length }}
-            </div>
+          <div class="calendar-grid grid grid-cols-7 gap-1 text-center">
+            <div class="text-xs font-semibold">Dim</div>
+            <div class="text-xs font-semibold">Lun</div>
+            <div class="text-xs font-semibold">Mar</div>
+            <div class="text-xs font-semibold">Mer</div>
+            <div class="text-xs font-semibold">Jeu</div>
+            <div class="text-xs font-semibold">Ven</div>
+            <div class="text-xs font-semibold">Sam</div>
+            <div
+              id="calendarDays"
+              class="col-span-7 grid grid-cols-7 gap-1"
+            ></div>
           </div>
-          <div class="stat">
-            <div class="stat-title">Listes de tâches</div>
-            <div class="stat-value">{{ lists|length }}</div>
-          </div>
+        </div>
+        <div class="card-actions justify-end mt-4">
+          <a href="{{ url_for('calendar.calendar') }}" class="btn btn-primary">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            Voir le calendrier complet
+          </a>
         </div>
       </div>
     </div>
@@ -243,40 +430,100 @@
 </div>
 
 <script>
-  let currentList = 0;
-  const lists = document.querySelectorAll(".carousel-item");
-  const totalLists = lists.length;
-  const indicators = document.querySelectorAll("#carousel-indicators button");
+  function filterTasks() {
+    const listFilter = document.getElementById("listFilter").value;
+    const statusFilter = document.getElementById("statusFilter").value;
+    const rows = document.querySelectorAll(".task-row");
 
-  function updateIndicators() {
-    indicators.forEach((indicator, index) => {
-      if (index === currentList) {
-        indicator.classList.add("btn-primary");
-      } else {
-        indicator.classList.remove("btn-primary");
+    rows.forEach((row) => {
+      const listMatch = !listFilter || row.dataset.list === listFilter;
+      const statusMatch = !statusFilter || row.dataset.status === statusFilter;
+
+      // Convertir les valeurs en chaînes de caractères pour la comparaison
+      const rowList = String(row.dataset.list);
+      const rowStatus = String(row.dataset.status);
+
+      // Vérifier les correspondances
+      const matchesList = !listFilter || rowList === listFilter;
+      const matchesStatus = !statusFilter || rowStatus === statusFilter;
+
+      // Afficher ou masquer la ligne en fonction des filtres
+      row.style.display = matchesList && matchesStatus ? "" : "none";
+    });
+  }
+
+  // Code pour le calendrier
+  let currentDate = new Date();
+  const months = [
+    "Janvier",
+    "Février",
+    "Mars",
+    "Avril",
+    "Mai",
+    "Juin",
+    "Juillet",
+    "Août",
+    "Septembre",
+    "Octobre",
+    "Novembre",
+    "Décembre",
+  ];
+
+  function updateCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    document.getElementById(
+      "currentMonth"
+    ).textContent = `${months[month]} ${year}`;
+
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    const calendarDays = document.getElementById("calendarDays");
+    calendarDays.innerHTML = "";
+
+    for (let i = 0; i < firstDay.getDay(); i++) {
+      const emptyDay = document.createElement("div");
+      emptyDay.className = "p-1 text-xs text-base-content/30";
+      calendarDays.appendChild(emptyDay);
+    }
+
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      const dayElement = document.createElement("div");
+      dayElement.className =
+        "p-1 text-xs hover:bg-base-100 rounded cursor-pointer";
+
+      const isToday =
+        new Date().toDateString() === new Date(year, month, day).toDateString();
+      if (isToday) {
+        dayElement.className += " bg-primary text-primary-content";
       }
-    });
+
+      dayElement.textContent = day;
+      dayElement.onclick = () =>
+        (window.location.href = `{{ url_for('calendar.calendar') }}?date=${year}-${(
+          month + 1
+        )
+          .toString()
+          .padStart(2, "0")}-${day.toString().padStart(2, "0")}`);
+      calendarDays.appendChild(dayElement);
+    }
   }
 
-  function showList(index) {
-    lists.forEach((list, i) => {
-      list.style.display = i === index ? "block" : "none";
-    });
-    currentList = index;
-    updateIndicators();
+  function previousMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    updateCalendar();
   }
 
-  function nextList() {
-    currentList = (currentList + 1) % totalLists;
-    showList(currentList);
+  function nextMonth() {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    updateCalendar();
   }
 
-  function prevList() {
-    currentList = (currentList - 1 + totalLists) % totalLists;
-    showList(currentList);
-  }
-
-  // Initialiser l'affichage
-  showList(0);
+  // Initialiser le calendrier
+  document.addEventListener("DOMContentLoaded", function () {
+    updateCalendar();
+  });
 </script>
 {% endblock %}

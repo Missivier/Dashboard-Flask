@@ -9,6 +9,9 @@ from app.config import DevelopmentConfig
 from app.routes.main import main
 from app.routes.auth import auth
 from app.routes.tasks import tasks
+from app.routes.pet_routes import bp as pets_bp
+from app.routes.budgets import budgets
+from app.routes.calendar import calendar_bp
 
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
@@ -57,6 +60,9 @@ def create_app():
     app.register_blueprint(auth)
     app.register_blueprint(main)
     app.register_blueprint(tasks)
+    app.register_blueprint(pets_bp)
+    app.register_blueprint(budgets)
+    app.register_blueprint(calendar_bp)
 
     # Ouvrir une connexion à chaque requête
     @app.before_request

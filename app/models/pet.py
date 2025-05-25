@@ -1,27 +1,38 @@
 from app.models.bdd import db
 from app.models.user import User
 from peewee import *
-from datetime import date
+from datetime import datetime
 
 class Pet(db.Model):
-    id_pet = AutoField(primary_key=True)
-    name_pet = CharField(max_length=100, null=False)
-    species_pet = CharField(max_length=50, null=False)
-    birth_date_pet = DateField(null=True)
-    user = ForeignKeyField(User, backref='pets', null=False)
+    id = AutoField(primary_key=True)
+    name = CharField(max_length=100, null=False)
+    species = CharField(max_length=50, null=False)
+    breed = CharField(max_length=50, null=True)
+    birth_date = DateField(null=True)
+    weight = FloatField(null=True)
+    owner = ForeignKeyField(User, backref='pets', null=False)
+    created_at = DateTimeField(default=datetime.now)
+    updated_at = DateTimeField(default=datetime.now)
 
     class Meta:
         table_name = 'pets'
 
-    @property
-    def age(self):
-        if self.birth_date_pet:
-            today = date.today()
-            age = today.year - self.birth_date_pet.year
-            if (today.month, today.day) < (self.birth_date_pet.month, self.birth_date_pet.day):
-                age -= 1
-            return age
-        return None
+    def save(self, *args, **kwargs):
+        self.updated_at = datetime.now()
+        return super(Pet, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.name_pet} ({self.species_pet})" 
+        return f"{self.name} ({self.species})"
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'species': self.species,
+            'breed': self.breed,
+            'birth_date': self.birth_date.isoformat() if self.birth_date else None,
+            'weight': self.weight,
+            'owner_id': self.owner.id,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        } 

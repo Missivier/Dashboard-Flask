@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, IntegerField, DateField, SelectField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, IntegerField, DateField, SelectField, FloatField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, NumberRange
 
 class RegisterForm(FlaskForm):
     name = StringField('Nom', validators=[DataRequired()])
@@ -47,3 +47,47 @@ class ListTaskForm(FlaskForm):
     """Formulaire pour la création et modification de listes de tâches"""
     name_list_task = StringField('Nom de la liste', validators=[DataRequired(), Length(max=100)])
     submit = SubmitField('Enregistrer') 
+
+class PetForm(FlaskForm):
+    name = StringField('Nom', validators=[
+        DataRequired(message="Le nom est requis"),
+        Length(min=2, max=100, message="Le nom doit contenir entre 2 et 100 caractères")
+    ])
+    
+    species = SelectField('Espèce', validators=[DataRequired(message="L'espèce est requise")], 
+                         choices=[
+                             ('chien', 'Chien'),
+                             ('chat', 'Chat'),
+                             ('oiseau', 'Oiseau'),
+                             ('rongeur', 'Rongeur'),
+                             ('autre', 'Autre')
+                         ])
+    
+    breed = StringField('Race', validators=[
+        Optional(),
+        Length(max=50, message="La race ne doit pas dépasser 50 caractères")
+    ])
+    
+    birth_date = DateField('Date de naissance', validators=[Optional()])
+    
+    weight = FloatField('Poids (kg)', validators=[
+        Optional(),
+        NumberRange(min=0, max=100, message="Le poids doit être compris entre 0 et 100 kg")
+    ])
+    
+    submit = SubmitField('Enregistrer') 
+
+class BudgetForm(FlaskForm):
+    name = StringField('Nom du budget', validators=[DataRequired(), Length(max=100)])
+    category = SelectField('Catégorie', choices=[
+        ('nourriture', 'Nourriture'),
+        ('veterinaire', 'Vétérinaire'),
+        ('accessoires', 'Accessoires'),
+        ('toilettage', 'Toilettage'),
+        ('assurance', 'Assurance'),
+        ('autre', 'Autre')
+    ], validators=[DataRequired()])
+    amount = FloatField('Montant (€)', validators=[DataRequired(), NumberRange(min=0)])
+    description = TextAreaField('Description', validators=[Optional(), Length(max=500)])
+    date = DateField('Date', validators=[DataRequired()])
+    is_expense = BooleanField('Dépense', default=True) 

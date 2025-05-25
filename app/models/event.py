@@ -1,6 +1,7 @@
 from peewee import *
 from datetime import datetime
 from app.models.bdd import BaseModel
+from app import db
 
 class Calendar(BaseModel):
     """Modèle pour les calendriers"""
@@ -10,20 +11,22 @@ class Calendar(BaseModel):
     def __str__(self):
         return self.name_calendar
 
-class Event(BaseModel):
+class Event(Model):
     """Modèle pour les événements"""
-    id_event = AutoField(primary_key=True)
-    name_event = CharField(max_length=200)
+    id = AutoField(primary_key=True)
+    title = CharField(max_length=200)
+    description = TextField(null=True)
     start_date = DateTimeField()
     end_date = DateTimeField(null=True)
-    type_event = CharField(max_length=50, null=True)
-    description_event = TextField(null=True)
+    created_at = DateTimeField(default=datetime.now)
+    updated_at = DateTimeField(default=datetime.now)
+    user_id = IntegerField()
     
     # Relations
-    calendar = ForeignKeyField(Calendar, backref='events', on_delete='CASCADE')
+    calendar = ForeignKeyField(Calendar, backref='events', on_delete='CASCADE', null=True)
     
     def __str__(self):
-        return self.name_event
+        return self.title
     
     @property
     def duration(self):
@@ -53,3 +56,11 @@ class Event(BaseModel):
         """Vérifie si l'événement est passé"""
         end_time = self.end_date or self.start_date
         return end_time < datetime.now()
+
+    def save(self, *args, **kwargs):
+        self.updated_at = datetime.now()
+        return super(Event, self).save(*args, **kwargs)
+
+    class Meta:
+        database = db
+        table_name = 'events'

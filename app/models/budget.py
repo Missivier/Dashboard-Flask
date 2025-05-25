@@ -1,40 +1,37 @@
+from app.models.bdd import db
 from peewee import *
 from datetime import datetime
-from app.models.bdd import BaseModel
 
-class Budget(BaseModel):
-    """Modèle pour les budgets"""
-    id_budget = AutoField(primary_key=True)
-    name_budget = CharField(max_length=100)
-    start_amount_budget = DecimalField(max_digits=12, decimal_places=2, default=0)
-    end_amount_budget = DecimalField(max_digits=12, decimal_places=2, null=True)
-    date_creation_budget = DateTimeField(default=datetime.now)
-    
+class Budget(db.Model):
+    id = AutoField(primary_key=True)
+    name = CharField(max_length=100, null=False)  # Nom du budget global
+    category = CharField(max_length=50, null=False)  # ex: nourriture, vétérinaire, accessoires
+    amount = FloatField(null=False)
+    description = TextField(null=True)
+    date = DateField(null=False)
+    is_expense = BooleanField(default=True)  # True pour une dépense, False pour un revenu
+    created_at = DateTimeField(default=datetime.now)
+    updated_at = DateTimeField(default=datetime.now)
+
+    class Meta:
+        table_name = 'budgets'
+
+    def save(self, *args, **kwargs):
+        self.updated_at = datetime.now()
+        return super(Budget, self).save(*args, **kwargs)
+
     def __str__(self):
-        return self.name_budget
-    
-    @property
-    def remaining_amount(self):
-        """Calcule le montant restant"""
-        if self.end_amount_budget is not None:
-            return self.start_amount_budget - self.end_amount_budget
-        return self.start_amount_budget
-    
-    @property
-    def spent_amount(self):
-        """Calcule le montant dépensé"""
-        if self.end_amount_budget is not None:
-            return self.end_amount_budget
-        return 0
-    
-    def add_expense(self, amount):
-        """Ajoute une dépense au budget"""
-        if self.end_amount_budget is None:
-            self.end_amount_budget = amount
-        else:
-            self.end_amount_budget += amount
-        self.save()
-    
-    def is_exceeded(self):
-        """Vérifie si le budget est dépassé"""
-        return self.end_amount_budget and self.end_amount_budget > self.start_amount_budget
+        return f"{self.name} - {self.category} - {self.amount}€ ({self.date})"
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'category': self.category,
+            'amount': self.amount,
+            'description': self.description,
+            'date': self.date.isoformat() if self.date else None,
+            'is_expense': self.is_expense,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
