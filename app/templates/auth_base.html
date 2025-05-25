@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#5E81AC",
+              secondary: "#81A1C1",
+              accent: "#88C0D0",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-base-900">
+    <div class="flex min-h-screen">
+      <!-- Partie gauche avec l'image et la carte -->
+      <div
+        class="w-1/2 hidden lg:flex flex-col justify-center items-center bg-base-900 relative overflow-hidden"
+      >
+        <img
+          src="{{ url_for('static', filename='images/auth-image.jpg') }}"
+          alt="Image d'authentification"
+          class="w-4/5 max-w-lg object-contain z-10"
+        />
+        <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-20">
+          {% block left_card %}{% endblock %}
+        </div>
+      </div>
+      <!-- Partie droite avec le formulaire -->
+      <div
+        class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-base-100 min-h-screen"
+      >
+        <div class="w-full max-w-md">{% block content %}{% endblock %}</div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,6 +1,8 @@
 from peewee import *
 from datetime import datetime
 from app.models.bdd import BaseModel
+from flask_login import UserMixin
+from app.models.house import House
 
 class Role(BaseModel):
     """Modèle pour les rôles utilisateur"""
@@ -10,7 +12,7 @@ class Role(BaseModel):
     def __str__(self):
         return self.name_role
 
-class User(BaseModel):
+class User(BaseModel, UserMixin):
     """Modèle pour les utilisateurs"""
     id_user = AutoField(primary_key=True)
     name_user = CharField(max_length=100)
@@ -23,9 +25,13 @@ class User(BaseModel):
     date_inscription = DateTimeField(default=datetime.now)
     description_user = TextField(null=True)
     photo_user = CharField(max_length=255, null=True)
+    password = CharField()
+    is_active = BooleanField(default=True)
     
     # Relations
     role = ForeignKeyField(Role, backref='users', on_delete='SET NULL', null=True)
+    house = ForeignKeyField(House, backref='users', on_delete='SET NULL', null=True)
+    is_admin_house = BooleanField(default=False)
     
     def __str__(self):
         return f"{self.first_name_user} {self.name_user}"
@@ -42,3 +48,6 @@ class User(BaseModel):
                 (today.month, today.day) < (self.date_birthday_user.month, self.date_birthday_user.day)
             )
         return self.age_user
+
+    def __repr__(self):
+        return f'<User {self.email_user}>'
