@@ -20,6 +20,8 @@ from app.routes.pet_routes import bp as pets_bp
 from app.routes.budgets import budgets
 from app.routes.calendar import calendar_bp
 from app.middleware import apply_security_headers
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 # Initialize Flask-Login for user authentication
 login_manager = LoginManager()
@@ -60,33 +62,7 @@ def create_app():
     # Initialize Flask-Login for user authentication
     login_manager.init_app(app)
     
-<<<<<<< HEAD
-    # Initialiser la protection CSRF
-    csrf.init_app(app)
-    
-    # Configuration des en-têtes CSRF
-    app.config['WTF_CSRF_HEADERS'] = ['X-CSRFToken', 'X-CSRF-Token']
-    app.config['WTF_CSRF_METHODS'] = ['POST', 'PUT', 'PATCH', 'DELETE']
-    
-    # Gestionnaire d'erreurs CSRF
-    @app.errorhandler(CSRFError)
-    def handle_csrf_error(e):
-        return jsonify({
-            'error': 'Erreur de validation CSRF',
-            'message': 'Le token CSRF est manquant ou invalide. Veuillez rafraîchir la page et réessayer.'
-        }), 400
-    
-    # Middleware pour rafraîchir le token CSRF
-    @app.after_request
-    def refresh_csrf_token(response):
-        if 'csrf_token' not in g:
-            g.csrf_token = generate_csrf()
-        return response
-    
-    # Initialiser la base de données
-=======
     # Initialize database connection
->>>>>>> 80ec7b8 (Add comment and test)
     init_database()
     
     # Security: Rate limiting to prevent brute force attacks

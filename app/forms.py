@@ -6,7 +6,8 @@ Each form class represents a different form in the application with its specific
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, IntegerField, DateField, SelectField, FloatField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, NumberRange
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, NumberRange, ValidationError, Regexp
+from app.models.user import User
 
 class RegisterForm(FlaskForm):
     """
@@ -15,11 +16,35 @@ class RegisterForm(FlaskForm):
     """
     name = StringField('Nom', validators=[DataRequired()])
     first_name = StringField('Prénom', validators=[DataRequired()])
-    username = StringField('Nom d\'utilisateur', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Mot de passe', validators=[DataRequired(), Length(min=8)])
-    confirm_password = PasswordField('Confirmer le mot de passe', validators=[DataRequired(), EqualTo('password')])
+    username = StringField('Nom d\'utilisateur', validators=[
+        DataRequired(),
+        Length(min=4, max=20)
+    ])
+    email = StringField('Email', validators=[
+        DataRequired(),
+        Email()
+    ])
+    password = PasswordField('Mot de passe', validators=[
+        DataRequired(),
+        Length(min=8),
+        Regexp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$',
+               message='Le mot de passe doit contenir au moins une lettre, un chiffre et un caractère spécial')
+    ])
+    confirm_password = PasswordField('Confirmer le mot de passe', validators=[
+        DataRequired(),
+        EqualTo('password', message='Les mots de passe doivent correspondre')
+    ])
     submit = SubmitField('S\'inscrire')
+
+    def validate_username(self, username):
+        user = User.get_or_none(User.username_user == username.data)
+        if user:
+            raise ValidationError('Ce nom d\'utilisateur est déjà pris.')
+
+    def validate_email(self, email):
+        user = User.get_or_none(User.email_user == email.data)
+        if user:
+            raise ValidationError('Cet email est déjà utilisé.')
 
 class LoginForm(FlaskForm):
     """
@@ -37,9 +62,9 @@ class CreateHouseForm(FlaskForm):
     Includes basic house information and optional fields.
     """
     name_house = StringField('Nom de la maison', validators=[DataRequired()])
-    adress = StringField('Adresse', validators=[Optional()])
-    description_house = TextAreaField('Description', validators=[Optional()])
-    photo_house = StringField('Photo (URL)', validators=[Optional()])
+    adress = StringField('Adresse', validators=[DataRequired()])
+    description_house = TextAreaField('Description')
+    photo_house = StringField('URL de la photo')
     submit = SubmitField('Créer la maison')
 
 class ProfileForm(FlaskForm):
@@ -50,12 +75,12 @@ class ProfileForm(FlaskForm):
     name_user = StringField('Nom', validators=[DataRequired()])
     first_name_user = StringField('Prénom', validators=[DataRequired()])
     username_user = StringField('Nom d\'utilisateur', validators=[DataRequired()])
-    phone_user = StringField('Téléphone', validators=[Optional()])
-    age_user = IntegerField('Âge', validators=[Optional()])
-    date_birthday_user = DateField('Date de naissance', validators=[Optional()])
+    phone_user = StringField('Téléphone')
+    age_user = IntegerField('Âge')
+    date_birthday_user = DateField('Date de naissance')
     email_user = StringField('Email', validators=[DataRequired(), Email()])
-    description_user = TextAreaField('Description', validators=[Optional()])
-    submit = SubmitField('Enregistrer les modifications')
+    description_user = TextAreaField('Description')
+    submit = SubmitField('Mettre à jour')
 
 class TaskForm(FlaskForm):
     """
@@ -74,7 +99,7 @@ class ListTaskForm(FlaskForm):
     Simple form with just a name field and submit button.
     """
     name_list_task = StringField('Nom de la liste', validators=[DataRequired(), Length(max=100)])
-    submit = SubmitField('Enregistrer') 
+    submit = SubmitField('Enregistrer')
 
 class PetForm(FlaskForm):
     """
@@ -129,5 +154,8 @@ class BudgetForm(FlaskForm):
     is_expense = BooleanField('Dépense', default=True)
 
 class TestForm(FlaskForm):
+    """
+    Formulaire de test pour la protection CSRF.
+    """
     message = StringField('Message', validators=[DataRequired()])
     submit = SubmitField('Envoyer') 
