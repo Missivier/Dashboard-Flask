@@ -5,6 +5,7 @@ from app.models.user import User
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_talisman import Talisman
+from flask_wtf.csrf import CSRFProtect, CSRFError, generate_csrf
 from app.config import DevelopmentConfig
 from app.routes.main import main
 from app.routes.auth import auth
@@ -15,6 +16,7 @@ from app.routes.calendar import calendar_bp
 
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
+csrf = CSRFProtect()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -26,6 +28,28 @@ def create_app():
     
     # Initialiser Flask-Login
     login_manager.init_app(app)
+    
+    # Initialiser la protection CSRF
+    csrf.init_app(app)
+    
+    # Configuration des en-têtes CSRF
+    app.config['WTF_CSRF_HEADERS'] = ['X-CSRFToken', 'X-CSRF-Token']
+    app.config['WTF_CSRF_METHODS'] = ['POST', 'PUT', 'PATCH', 'DELETE']
+    
+    # Gestionnaire d'erreurs CSRF
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        return jsonify({
+            'error': 'Erreur de validation CSRF',
+            'message': 'Le token CSRF est manquant ou invalide. Veuillez rafraîchir la page et réessayer.'
+        }), 400
+    
+    # Middleware pour rafraîchir le token CSRF
+    @app.after_request
+    def refresh_csrf_token(response):
+        if 'csrf_token' not in g:
+            g.csrf_token = generate_csrf()
+        return response
     
     # Initialiser la base de données
     init_database()

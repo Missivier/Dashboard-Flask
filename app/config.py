@@ -15,6 +15,9 @@ class Config:
     
     # Configuration de sécurité
     WTF_CSRF_ENABLED = True
+    WTF_CSRF_TIME_LIMIT = 3600  # 1 heure
+    WTF_CSRF_SSL_STRICT = True
+    WTF_CSRF_CHECK_DEFAULT = True
     SESSION_COOKIE_SECURE = os.environ.get('SESSION_COOKIE_SECURE', 'True').lower() == 'true'
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = os.environ.get('SESSION_COOKIE_SAMESITE', 'Lax')

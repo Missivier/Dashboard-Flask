@@ -90,4 +90,8 @@ class BudgetForm(FlaskForm):
     amount = FloatField('Montant (€)', validators=[DataRequired(), NumberRange(min=0)])
     description = TextAreaField('Description', validators=[Optional(), Length(max=500)])
     date = DateField('Date', validators=[DataRequired()])
-    is_expense = BooleanField('Dépense', default=True) 
+    is_expense = BooleanField('Dépense', default=True)
+
+class TestForm(FlaskForm):
+    message = StringField('Message', validators=[DataRequired()])
+    submit = SubmitField('Envoyer') 

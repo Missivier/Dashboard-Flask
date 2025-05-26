@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
 from app.models.user import User, Role
 from app.models.house import House
 from app.models.task import Task, ListTask
-from app.forms import RegisterForm, LoginForm, CreateHouseForm, ProfileForm, TaskForm, ListTaskForm
+from app.forms import RegisterForm, LoginForm, CreateHouseForm, ProfileForm, TaskForm, ListTaskForm, TestForm
 from app.models.budget import Budget
 from app.models.event import Event
 from app.models.pet import Pet
@@ -99,4 +99,27 @@ def create_house():
         current_user.save()
         flash('Maison créée et associée avec succès', 'success')
         return redirect(url_for('main.dashboard'))
-    return render_template('create_house.html', form=form) 
+    return render_template('create_house.html', form=form)
+
+@main.route('/test-csrf', methods=['GET', 'POST'])
+def test_csrf():
+    form = TestForm()
+    if form.validate_on_submit():
+        return jsonify({
+            'success': True,
+            'message': 'Formulaire soumis avec succès',
+            'data': form.message.data
+        })
+    return render_template('test_csrf.html', form=form)
+
+@main.route('/test-csrf-api', methods=['POST'])
+def test_csrf_api():
+    if not request.is_json:
+        return jsonify({'error': 'Content-Type doit être application/json'}), 400
+    
+    data = request.get_json()
+    return jsonify({
+        'success': True,
+        'message': 'Requête API traitée avec succès',
+        'data': data
+    }) 

@@ -1,0 +1,78 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-5">
+  <h2>Test de Protection CSRF</h2>
+
+  <!-- Formulaire HTML standard -->
+  <div class="card mb-4">
+    <div class="card-header">Test avec formulaire HTML</div>
+    <div class="card-body">
+      <form method="POST" id="htmlForm">
+        {{ form.csrf_token }}
+        <div class="mb-3">
+          {{ form.message.label(class="form-label") }} {{
+          form.message(class="form-control") }}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+      </form>
+    </div>
+  </div>
+
+  <!-- Test avec AJAX -->
+  <div class="card">
+    <div class="card-header">Test avec AJAX</div>
+    <div class="card-body">
+      <form id="ajaxForm">
+        <div class="mb-3">
+          <label for="message" class="form-label">Message</label>
+          <input
+            type="text"
+            class="form-control"
+            id="message"
+            name="message"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Envoyer (AJAX)</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Résultats -->
+  <div class="mt-4">
+    <h3>Résultats</h3>
+    <pre id="results" class="bg-light p-3"></pre>
+  </div>
+</div>
+
+<script>
+  document
+    .getElementById("ajaxForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      try {
+        const response = await fetch("/test-csrf-api", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": document.querySelector('input[name="csrf_token"]')
+              .value,
+          },
+          body: JSON.stringify({
+            message: document.getElementById("message").value,
+          }),
+        });
+
+        const data = await response.json();
+        document.getElementById("results").textContent = JSON.stringify(
+          data,
+          null,
+          2
+        );
+      } catch (error) {
+        document.getElementById("results").textContent =
+          "Erreur: " + error.message;
+      }
+    });
+</script>
+{% endblock %}
