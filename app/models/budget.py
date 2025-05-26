@@ -1,15 +1,24 @@
+"""
+Budget model for the application.
+Represents budget entries for expenses and income using Peewee ORM.
+"""
+
 from app.models.bdd import db
 from peewee import *
 from datetime import datetime
 
 class Budget(db.Model):
+    """
+    Model representing a budget entry (expense or income).
+    Stores name, category, amount, description, date, and type (expense/income).
+    """
     id = AutoField(primary_key=True)
-    name = CharField(max_length=100, null=False)  # Nom du budget global
-    category = CharField(max_length=50, null=False)  # ex: nourriture, vétérinaire, accessoires
+    name = CharField(max_length=100, null=False)  # Budget name
+    category = CharField(max_length=50, null=False)  # e.g., food, vet, accessories
     amount = FloatField(null=False)
     description = TextField(null=True)
     date = DateField(null=False)
-    is_expense = BooleanField(default=True)  # True pour une dépense, False pour un revenu
+    is_expense = BooleanField(default=True)  # True for expense, False for income
     created_at = DateTimeField(default=datetime.now)
     updated_at = DateTimeField(default=datetime.now)
 
@@ -17,6 +26,9 @@ class Budget(db.Model):
         table_name = 'budgets'
 
     def save(self, *args, **kwargs):
+        """
+        Updates the 'updated_at' timestamp on every save.
+        """
         self.updated_at = datetime.now()
         return super(Budget, self).save(*args, **kwargs)
 
@@ -24,6 +36,9 @@ class Budget(db.Model):
         return f"{self.name} - {self.category} - {self.amount}€ ({self.date})"
 
     def to_dict(self):
+        """
+        Returns a dictionary representation of the budget entry.
+        """
         return {
             'id': self.id,
             'name': self.name,

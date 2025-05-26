@@ -1,3 +1,9 @@
+"""
+Flask application factory and initialization module.
+This module sets up the Flask application with all necessary extensions,
+security configurations, and database connections.
+"""
+
 from flask import Flask, g, jsonify
 from flask_login import LoginManager
 from app.models.bdd import db, init_database
@@ -12,32 +18,57 @@ from app.routes.tasks import tasks
 from app.routes.pet_routes import bp as pets_bp
 from app.routes.budgets import budgets
 from app.routes.calendar import calendar_bp
+from app.middleware import apply_security_headers
 
+# Initialize Flask-Login for user authentication
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
 @login_manager.user_loader
 def load_user(user_id):
+    """
+    User loader callback for Flask-Login.
+    Retrieves a user from the database by their ID.
+    
+    Args:
+        user_id: The ID of the user to load
+        
+    Returns:
+        User: The user object if found, None otherwise
+    """
     return User.get_by_id(user_id)
 
 def create_app():
+    """
+    Application factory function that creates and configures the Flask application.
+    
+    This function:
+    1. Creates the Flask application
+    2. Configures security settings
+    3. Initializes extensions
+    4. Registers blueprints
+    5. Sets up database connection handling
+    
+    Returns:
+        Flask: The configured Flask application instance
+    """
     app = Flask(__name__)
     app.config.from_object(DevelopmentConfig)
     
-    # Initialiser Flask-Login
+    # Initialize Flask-Login for user authentication
     login_manager.init_app(app)
     
-    # Initialiser la base de données
+    # Initialize database connection
     init_database()
     
-    # Sécurité : Limiter les requêtes (anti-bruteforce)
+    # Security: Rate limiting to prevent brute force attacks
     limiter = Limiter(
         get_remote_address,
         app=app,
         default_limits=["200 per day", "20 per minute"]
     )
     
-    # Sécurité : Headers HTTP avec CSP adaptée pour CDN
+    # Security: HTTP headers with CSP configured for CDN usage
     csp = {
         'default-src': [
             "'self'",
@@ -56,7 +87,10 @@ def create_app():
     }
     Talisman(app, content_security_policy=csp)
     
-    # Enregistrer les blueprints
+    # Apply custom security headers
+    app.after_request(apply_security_headers)
+    
+    # Register application blueprints
     app.register_blueprint(auth)
     app.register_blueprint(main)
     app.register_blueprint(tasks)
@@ -64,21 +98,36 @@ def create_app():
     app.register_blueprint(budgets)
     app.register_blueprint(calendar_bp)
 
-    # Ouvrir une connexion à chaque requête
     @app.before_request
     def before_request():
+        """
+        Ensure database connection is open before each request.
+        Stores the database connection in Flask's g object for request context.
+        """
         if db.is_closed():
             db.connect()
         g.db = db
 
-    # Fermer la connexion après la requête
     @app.teardown_request
     def teardown_request(exception):
+        """
+        Close database connection after each request.
+        
+        Args:
+            exception: Any exception that occurred during the request
+        """
         if not db.is_closed():
             db.close()
 
     @app.route('/')
     def index():
+        """
+        Root endpoint that returns a simple JSON response
+        indicating the application is running.
+        
+        Returns:
+            JSON: A success message indicating the application is running
+        """
         return jsonify({
             "status": "success",
             "message": "L'application Flask est en cours d'exécution !"

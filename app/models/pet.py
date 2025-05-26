@@ -1,9 +1,18 @@
+"""
+Pet model for the application.
+Represents pets owned by users, including species, breed, and other details using Peewee ORM.
+"""
+
 from app.models.bdd import db
 from app.models.user import User
 from peewee import *
 from datetime import datetime
 
 class Pet(db.Model):
+    """
+    Model representing a pet owned by a user.
+    Stores pet details such as name, species, breed, birth date, and weight.
+    """
     id = AutoField(primary_key=True)
     name = CharField(max_length=100, null=False)
     species = CharField(max_length=50, null=False)
@@ -18,6 +27,9 @@ class Pet(db.Model):
         table_name = 'pets'
 
     def save(self, *args, **kwargs):
+        """
+        Updates the 'updated_at' timestamp on every save.
+        """
         self.updated_at = datetime.now()
         return super(Pet, self).save(*args, **kwargs)
 
@@ -25,6 +37,9 @@ class Pet(db.Model):
         return f"{self.name} ({self.species})"
 
     def to_dict(self):
+        """
+        Returns a dictionary representation of the pet instance.
+        """
         return {
             'id': self.id,
             'name': self.name,

@@ -1,14 +1,23 @@
+"""
+Calendar management routes for the application.
+Handles CRUD operations for events and calendar views.
+"""
+
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash
 from app.models.event import Event, Calendar
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask_login import login_required, current_user
 
 calendar_bp = Blueprint('calendar', __name__)
 
 @calendar_bp.route('/calendar')
 @login_required
-def calendar():
-    return render_template('calendar/index.html')
+def index():
+    """
+    Displays the calendar view with all events.
+    """
+    events = Event.select().where(Event.user_id == current_user.id)
+    return render_template('calendar/index.html', events=events)
 
 @calendar_bp.route('/api/events')
 @login_required
@@ -80,4 +89,65 @@ def delete_event(event_id):
         event.delete_instance()
         return jsonify({'message': 'Event deleted successfully'})
     except Exception as e:
-        return jsonify({'error': str(e)}), 400 
+        return jsonify({'error': str(e)}), 400
+
+@calendar_bp.route('/calendar/new', methods=['GET', 'POST'])
+@login_required
+def new():
+    """
+    Creates a new calendar event.
+    """
+    # Implementation of the new route
+    pass
+
+@calendar_bp.route('/calendar/<int:id_event>/edit', methods=['GET', 'POST'])
+@login_required
+def edit(id_event):
+    """
+    Edits an existing calendar event.
+    """
+    # Implementation of the edit route
+    pass
+
+@calendar_bp.route('/calendar/<int:id_event>/delete', methods=['POST'])
+@login_required
+def delete(id_event):
+    """
+    Deletes a calendar event.
+    """
+    # Implementation of the delete route
+    pass
+
+@calendar_bp.route('/calendar/upcoming')
+@login_required
+def upcoming():
+    """
+    Displays upcoming events for the next 7 days.
+    """
+    today = datetime.now().date()
+    next_week = today + timedelta(days=7)
+    
+    events = Event.select().where(
+        (Event.user_id == current_user.id) &
+        (Event.start_date >= today) &
+        (Event.start_date <= next_week)
+    ).order_by(Event.start_date)
+    
+    return render_template('calendar/upcoming.html', events=events)
+
+@calendar_bp.route('/calendar/today')
+@login_required
+def today():
+    """
+    Displays events scheduled for today.
+    """
+    today = datetime.now().date()
+    tomorrow = today + timedelta(days=1)
+    
+    events = Event.select().where(
+        (Event.user_id == current_user.id) &
+        (Event.start_date >= today) &
+        (Event.start_date < tomorrow)
+    ).order_by(Event.start_date)
+    
+    return render_template('calendar/today.html', events=events) 

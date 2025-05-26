@@ -3,10 +3,12 @@ from flask_login import login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models.user import User, Role
 from app.forms import RegisterForm, LoginForm
+from app.middleware import login_attempts_required, record_login_attempt
 
 auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['GET', 'POST'])
+@login_attempts_required
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -24,6 +26,8 @@ def login():
                 return redirect(url_for('main.create_house'))
             return redirect(url_for('main.dashboard'))
         
+        # Enregistrer la tentative de connexion échouée
+        record_login_attempt()
         flash('Email ou mot de passe incorrect', 'error')
     return render_template('auth/login.html', form=form)
 
