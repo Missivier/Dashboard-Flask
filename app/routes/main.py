@@ -1,13 +1,9 @@
-<<<<<<< HEAD
-from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
-=======
 """
 Main application routes for the dashboard, profile, and house management.
 Handles user dashboard, profile editing, and house creation logic.
 """
 
-from flask import Blueprint, render_template, redirect, url_for, request, flash
->>>>>>> 80ec7b8 (Add comment and test)
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
 from app.models.user import User, Role
 from app.models.house import House
@@ -127,6 +123,10 @@ def create_house():
 
 @main.route('/test-csrf', methods=['GET', 'POST'])
 def test_csrf():
+    """
+    Route de test pour la protection CSRF.
+    Permet de tester la protection CSRF avec un formulaire standard et une requête AJAX.
+    """
     form = TestForm()
     if form.validate_on_submit():
         return jsonify({
@@ -138,6 +138,10 @@ def test_csrf():
 
 @main.route('/test-csrf-api', methods=['POST'])
 def test_csrf_api():
+    """
+    Route API de test pour la protection CSRF.
+    Permet de tester la protection CSRF avec une requête AJAX.
+    """
     if not request.is_json:
         return jsonify({'error': 'Content-Type doit être application/json'}), 400
     
