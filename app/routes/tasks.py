@@ -1,3 +1,8 @@
+"""
+Task management routes for the application.
+Handles CRUD operations for tasks and task lists, including status toggling.
+"""
+
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
 from app.models.task import Task, ListTask, Status
@@ -8,7 +13,9 @@ tasks = Blueprint('tasks', __name__)
 @tasks.route('/tasks')
 @login_required
 def index():
-    """Affiche la liste des tâches"""
+    """
+    Displays the list of tasks and task lists.
+    """
     tasks = Task.select().where(Task.list_task.is_null(False))
     lists = ListTask.select()
     return render_template('tasks/index.html', tasks=tasks, lists=lists)
@@ -16,9 +23,12 @@ def index():
 @tasks.route('/tasks/new', methods=['GET', 'POST'])
 @login_required
 def new():
-    """Crée une nouvelle tâche"""
+    """
+    Creates a new task.
+    Populates form choices for status and task list.
+    """
     form = TaskForm()
-    # Remplir les choix des select
+    # Populate select choices
     form.status.choices = [(s.id_status, s.name_status) for s in Status.select()]
     form.list_task.choices = [(l.id_list_task, l.name_list_task) for l in ListTask.select()]
     
@@ -37,7 +47,10 @@ def new():
 @tasks.route('/tasks/<int:id_task>/edit', methods=['GET', 'POST'])
 @login_required
 def edit(id_task):
-    """Modifie une tâche existante"""
+    """
+    Edits an existing task.
+    Populates form with task data and updates on submission.
+    """
     task = Task.get_or_none(Task.id_task == id_task)
     if not task:
         flash('Tâche non trouvée', 'error')
@@ -61,7 +74,9 @@ def edit(id_task):
 @tasks.route('/tasks/<int:id_task>/delete', methods=['POST'])
 @login_required
 def delete(id_task):
-    """Supprime une tâche"""
+    """
+    Deletes a task.
+    """
     task = Task.get_or_none(Task.id_task == id_task)
     if task:
         task.delete_instance()
@@ -73,7 +88,9 @@ def delete(id_task):
 @tasks.route('/tasks/lists/new', methods=['GET', 'POST'])
 @login_required
 def new_list():
-    """Crée une nouvelle liste de tâches"""
+    """
+    Creates a new task list.
+    """
     form = ListTaskForm()
     if form.validate_on_submit():
         list_task = ListTask.create(
@@ -87,7 +104,9 @@ def new_list():
 @tasks.route('/tasks/lists/<int:id_list_task>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_list(id_list_task):
-    """Modifie une liste de tâches existante"""
+    """
+    Edits an existing task list.
+    """
     list_task = ListTask.get_or_none(ListTask.id_list_task == id_list_task)
     if not list_task:
         flash('Liste non trouvée', 'error')
@@ -105,7 +124,9 @@ def edit_list(id_list_task):
 @tasks.route('/tasks/lists/<int:id_list_task>/delete', methods=['POST'])
 @login_required
 def delete_list(id_list_task):
-    """Supprime une liste de tâches"""
+    """
+    Deletes a task list.
+    """
     list_task = ListTask.get_or_none(ListTask.id_list_task == id_list_task)
     if list_task:
         list_task.delete_instance()
@@ -117,20 +138,23 @@ def delete_list(id_list_task):
 @tasks.route('/tasks/<int:id_task>/toggle', methods=['POST'])
 @login_required
 def toggle_status(id_task):
-    """Change le statut d'une tâche (complétée/non complétée)"""
+    """
+    Toggles the completion status of a task.
+    Switches between 'En cours' and 'Terminé' statuses.
+    """
     task = Task.get_or_none(Task.id_task == id_task)
     if task:
-        # Récupérer le statut "Terminé" ou le créer s'il n'existe pas
+        # Get or create 'Terminé' status
         status_completed = Status.get_or_none(Status.name_status == 'Terminé')
         if not status_completed:
             status_completed = Status.create(name_status='Terminé')
         
-        # Récupérer le statut "En cours" ou le créer s'il n'existe pas
+        # Get or create 'En cours' status
         status_in_progress = Status.get_or_none(Status.name_status == 'En cours')
         if not status_in_progress:
             status_in_progress = Status.create(name_status='En cours')
         
-        # Changer le statut
+        # Toggle status
         if task.is_completed:
             task.status = status_in_progress
         else:
@@ -141,5 +165,5 @@ def toggle_status(id_task):
     else:
         flash('Tâche non trouvée', 'error')
     
-    # Rediriger vers la page précédente
+    # Redirect to previous page
     return redirect(request.referrer or url_for('tasks.index')) 

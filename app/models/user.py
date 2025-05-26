@@ -1,3 +1,8 @@
+"""
+User and Role models for the application.
+Defines user authentication, profile, and role management using Peewee ORM.
+"""
+
 from peewee import *
 from datetime import datetime
 from app.models.bdd import BaseModel
@@ -5,7 +10,9 @@ from flask_login import UserMixin
 from app.models.house import House
 
 class Role(BaseModel):
-    """Modèle pour les rôles utilisateur"""
+    """
+    Model representing user roles (e.g., admin, member).
+    """
     id_role = AutoField(primary_key=True)
     name_role = CharField(max_length=50, unique=True)
     
@@ -13,7 +20,10 @@ class Role(BaseModel):
         return self.name_role
 
 class User(BaseModel, UserMixin):
-    """Modèle pour les utilisateurs"""
+    """
+    Model representing application users.
+    Includes authentication, profile, and relationship fields.
+    """
     id_user = AutoField(primary_key=True)
     name_user = CharField(max_length=100)
     first_name_user = CharField(max_length=100)
@@ -28,7 +38,7 @@ class User(BaseModel, UserMixin):
     password = CharField()
     is_active = BooleanField(default=True)
     
-    # Relations
+    # Relationships
     role = ForeignKeyField(Role, backref='users', on_delete='SET NULL', null=True)
     house = ForeignKeyField(House, backref='users', on_delete='SET NULL', null=True)
     is_admin_house = BooleanField(default=False)
@@ -38,10 +48,16 @@ class User(BaseModel, UserMixin):
     
     @property
     def full_name(self):
+        """
+        Returns the user's full name (first + last).
+        """
         return f"{self.first_name_user} {self.name_user}"
     
     def get_age_from_birthday(self):
-        """Calcule l'âge à partir de la date de naissance"""
+        """
+        Calculates the user's age from their birthday.
+        Returns the stored age if birthday is not set.
+        """
         if self.date_birthday_user:
             today = datetime.now().date()
             return today.year - self.date_birthday_user.year - (

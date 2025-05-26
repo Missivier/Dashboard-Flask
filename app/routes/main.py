@@ -1,4 +1,13 @@
+<<<<<<< HEAD
 from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
+=======
+"""
+Main application routes for the dashboard, profile, and house management.
+Handles user dashboard, profile editing, and house creation logic.
+"""
+
+from flask import Blueprint, render_template, redirect, url_for, request, flash
+>>>>>>> 80ec7b8 (Add comment and test)
 from flask_login import login_required, current_user
 from app.models.user import User, Role
 from app.models.house import House
@@ -14,23 +23,30 @@ main = Blueprint('main', __name__)
 @main.route('/')
 @login_required
 def index():
+    """
+    Home page route (redirects to dashboard if logged in).
+    """
     return render_template('main/index.html')
 
 @main.route('/dashboard')
 @login_required
 def dashboard():
+    """
+    Dashboard route for authenticated users.
+    Displays user info, tasks, budgets, pets, and event statistics.
+    """
     user = current_user
     house = user.house
-    # Récupérer les listes de tâches et les tâches
+    # Retrieve task lists and tasks
     lists = ListTask.select()
     tasks = Task.select().where(Task.list_task.is_null(False))
-    # Récupérer tous les budgets
+    # Retrieve all budgets
     budgets = Budget.select()
     total_expenses = sum(b.amount for b in budgets if b.is_expense)
     total_income = sum(b.amount for b in budgets if not b.is_expense)
-    # Récupérer les animaux de l'utilisateur
+    # Retrieve user's pets
     pets = Pet.select().where(Pet.owner == current_user)
-    # Récupérer les événements à venir et d'aujourd'hui
+    # Retrieve upcoming and today's events
     today = datetime.now().date()
     tomorrow = today + timedelta(days=1)
     
@@ -60,6 +76,10 @@ def dashboard():
 @main.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
+    """
+    Profile editing route for the current user.
+    Allows users to update their personal information.
+    """
     form = ProfileForm(obj=current_user)
     if form.validate_on_submit():
         current_user.name_user = form.name_user.data
@@ -77,6 +97,10 @@ def profile():
 
 @main.route('/create-house', methods=['GET', 'POST'])
 def create_house():
+    """
+    Route for creating a new house and associating it with the user.
+    Assigns the user as house admin and updates their role.
+    """
     if not current_user.is_authenticated:
         return redirect(url_for('auth.login'))
     form = CreateHouseForm()
